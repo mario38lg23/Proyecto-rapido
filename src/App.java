@@ -8,6 +8,7 @@ public class App {
     gestionApp gestion = new gestionApp();
 
     do {
+        System.out.println();
         System.out.println("Seleccione una opcion ");
         System.out.println("1. Seleccionar carpeta ");
         System.out.println("2. Lectura de fichero ");
