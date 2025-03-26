@@ -27,6 +27,7 @@ public class CSV {
                 if (primeraLinea) {
                     encabezados = valores;
                     primeraLinea = false;
+                    System.out.println();
                 } else {
                     Map<String, String> fila = new HashMap<>();
                     for (int i = 0; i < encabezados.length; i++) {

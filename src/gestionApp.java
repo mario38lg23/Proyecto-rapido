@@ -35,6 +35,7 @@ public class gestionApp {
         }
     }
 
+    
     public void leerArchivo(String nombreArchivo) {
         String rutaCompleta = nombreArchivo;
         System.out.println(rutaCompleta);
