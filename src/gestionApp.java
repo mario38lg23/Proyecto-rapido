@@ -4,18 +4,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class gestionApp {
     ArrayList<CSV> ArrayListCSV = new ArrayList<>();
     ArrayList<XML> ArrayListXML = new ArrayList<>();
     ArrayList<JSON> ArrayListJSON = new ArrayList<>();
 
-    public gestionApp(){
+    public gestionApp() {
 
     }
 
-    public void comprobarFichero(String ruta){
+    public void comprobarFichero(String ruta) {
         File fichero = new File(ruta);
 
         if (fichero.exists()) {
@@ -37,9 +40,9 @@ public class gestionApp {
         }
     }
 
-    public void leerFicheroCSV(String rutaDos){
+    public void leerFicheroCSV(String rutaDos) {
         File fichero = new File(rutaDos);
-                
+
         if (fichero.exists()) {
             if (fichero.isDirectory()) {
                 System.out.println("Es un directorio. Contenido:");
@@ -67,65 +70,82 @@ public class gestionApp {
             System.out.println("Esta ruta no existe.");
         }
     }
-    public void leerFicheroXML(String rutaDos){
+
+    public void leerFicheroXML(String rutaDos) {
         File fichero = new File(rutaDos);
-                
-        if (fichero.exists()) {
-            if (fichero.isDirectory()) {
-                System.out.println("Es un directorio. Contenido:");
-                String[] contenido = fichero.list();
-                if (contenido != null) {
-                    for (String item : contenido) {
-                        System.out.println(item);
-                    }
-                } else {
-                    System.out.println("El directorio está vacío o no se puede leer.");
+
+        if (!fichero.exists()) {
+            System.out.println("Esta ruta no existe.");
+            return;
+        }
+
+        if (fichero.isDirectory()) {
+            System.out.println("Es un directorio. Contenido:");
+            String[] contenido = fichero.list();
+            if (contenido != null) {
+                for (String item : contenido) {
+                    System.out.println(item);
                 }
             } else {
-            System.out.println("La ruta seleccionada es un archivo XML.");
+                System.out.println("El directorio está vacío o no se puede leer.");
+            }
+            return;
+        }
 
-            try (BufferedReader br = new BufferedReader(new FileReader(rutaDos))) {
-                System.out.println("Leyendo el fichero y extrayendo datos:");
-    
-                // Leer todo el contenido del archivo XML
-                StringBuilder contenidoXML = new StringBuilder();
-                String linea;
-                while ((linea = br.readLine()) != null) {
-                    contenidoXML.append(linea.trim()); // Elimina espacios extra
-                }
-    
-                // Convertir a String
-                String xml = contenidoXML.toString();
-                Map<String, String> xmlMap = new HashMap<>();
-    
-                // Expresión regular mejorada para extraer solo etiquetas de datos
-                String[] partes = xml.split("</?([^>]+)>");
-    
-                // Recorrer y guardar en el mapa
-                for (int i = 1; i < partes.length - 1; i += 2) {
-                    String clave = partes[i].trim();
-                    String valor = partes[i + 1].trim();
-    
-                    // Filtrar etiquetas no deseadas
-                    if (!clave.equalsIgnoreCase("coches") && !clave.equalsIgnoreCase("coche")) {
-                        xmlMap.put(clave, valor);
-                    }
-                }
-    
-                // Imprimir el mapa resultante
-                System.out.println(xmlMap);
+        System.out.println("La ruta seleccionada es un archivo XML.");
 
-                } catch (IOException e) {
-                    System.out.println("Error al leer el archivo: " + e.getMessage());
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaDos))) {
+            StringBuilder contenidoXML = new StringBuilder();
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                contenidoXML.append(linea.trim());
+            }
+
+            String xml = contenidoXML.toString();
+            List<List<Map<String, String>>> listaCoches = new ArrayList<>();
+
+            // Expresión regular para extraer coches completos
+            Pattern cochePattern = Pattern.compile("<coche>(.*?)</coche>");
+            Matcher cocheMatcher = cochePattern.matcher(xml);
+
+            while (cocheMatcher.find()) {
+                String cocheXML = cocheMatcher.group(1);
+                List<Map<String, String>> cocheListaMapas = new ArrayList<>();
+
+                // Expresión regular para extraer cada etiqueta dentro de <coche>
+                Pattern etiquetaPattern = Pattern.compile("<([^/][^>]*)>(.*?)</\\1>");
+                Matcher etiquetaMatcher = etiquetaPattern.matcher(cocheXML);
+
+                while (etiquetaMatcher.find()) {
+                    String clave = etiquetaMatcher.group(1).trim();
+                    String valor = etiquetaMatcher.group(2).trim();
+
+                    // Crear un nuevo mapa para cada etiqueta y agregarlo a la lista del coche
+                    Map<String, String> mapaEtiqueta = new HashMap<>();
+                    mapaEtiqueta.put(clave, valor);
+                    cocheListaMapas.add(mapaEtiqueta);
+                }
+
+                // Agregar la lista de mapas de este coche a la lista de coches
+                listaCoches.add(cocheListaMapas);
+            }
+
+            // Imprimir la estructura
+            for (int i = 0; i < listaCoches.size(); i++) {
+                System.out.println("Coche " + (i + 1) + ": ");
+                for (Map<String, String> mapa : listaCoches.get(i)) {
+                    System.out.println("  " + mapa);
                 }
             }
-        } else {
-            System.out.println("Esta ruta no existe.");
+
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
         }
     }
-    public void leerFicheroJSON(String rutaDos){
+
+    public void leerFicheroJSON(String rutaDos) {
         File fichero = new File(rutaDos);
-                
+
         if (fichero.exists()) {
             if (fichero.isDirectory()) {
                 System.out.println("Es un directorio. Contenido:");
