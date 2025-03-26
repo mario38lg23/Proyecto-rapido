@@ -41,7 +41,7 @@ public class CSV {
         return datos;
     }
 
-    public void convertirCSV(String rutaArchivo) {
+    public void escribirCSV(String rutaArchivo) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
 
             bw.write(String.join(",", encabezados));

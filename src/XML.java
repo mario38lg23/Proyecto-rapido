@@ -90,6 +90,6 @@ public class XML {
         }
     }
 
-    public void convertirXML(String rutaArchivo) {
+    public void escribirXML(String rutaArchivo) {
     }
 }

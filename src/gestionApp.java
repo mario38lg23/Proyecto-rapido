@@ -83,14 +83,14 @@ public class gestionApp {
         String extension = obtenerExtension(nombreArchivo);
 
         if (extension.equalsIgnoreCase("csv")) {
-            csv.convertirCSV(rutaCompleta);
+            csv.escribirCSV(rutaCompleta);
             salir = true;
         } else if (extension.equalsIgnoreCase("json")) {
-            json.convertirJSON(rutaCompleta);
+            json.escribirJSON(rutaCompleta);
             salir = true;
         } else if (extension.equalsIgnoreCase("xml")) {
             xml.setNombreRaiz("root");
-            xml.convertirXML(rutaCompleta);
+            xml.escribirXML(rutaCompleta);
             salir = true;
         }
 

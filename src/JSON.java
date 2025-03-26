@@ -18,7 +18,7 @@ public class JSON {
         return null;
     }
 
-    public void convertirJSON(String rutaArchivo) {
+    public void escribirJSON(String rutaArchivo) {
     }
 
 }
