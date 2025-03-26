@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> Miguel
 import java.util.Scanner;
 
 public class App {
@@ -25,7 +29,11 @@ public class App {
             case 2:
                 System.out.println("Dime la ruta que deseas");
                 String rutaDos = sc.nextLine();
+<<<<<<< HEAD
                 gestion.leerFicheroXML(rutaDos);
+=======
+                gestion.leerFichero(rutaDos);
+>>>>>>> Miguel
                 break;
 
                 case 3:
