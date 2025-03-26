@@ -42,7 +42,6 @@ public class App {
                     String nombreSalida = sc.nextLine();
                     gestion.convertirArchivo(archivoOrigen, formatoSalida, nombreSalida);
                     break;
-
                 case 0:
                     salir = true;
                     System.out.println("Saliendo del programa...");
