@@ -1,4 +1,8 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class CSV {
@@ -8,7 +12,7 @@ public class CSV {
     public CSV() {
         this.datos = new ArrayList<>();
     }
-    
+
     public List<Map<String, String>> getDatos() {
         return datos;
     }
@@ -16,22 +20,23 @@ public class CSV {
     public String[] getEncabezados() {
         return encabezados;
     }
-    
+
     public List<Map<String, String>> leerCSV(String rutaArchivo) {
-        datos.clear();
+        List<Map<String, String>> datos = new ArrayList<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
-            boolean primeraLinea = true;
+            String[] encabezados = null;
+
             while ((linea = br.readLine()) != null) {
                 String[] valores = linea.split(",");
-                if (primeraLinea) {
+
+                if (encabezados == null) {
                     encabezados = valores;
-                    primeraLinea = false;
-                    System.out.println();
                 } else {
-                    Map<String, String> fila = new HashMap<>();
+                    Map<String, String> fila = new LinkedHashMap<>();
                     for (int i = 0; i < encabezados.length; i++) {
-                        fila.put(encabezados[i], i < valores.length ? valores[i] : "");
+                        fila.put(encabezados[i], valores[i]);
                     }
                     datos.add(fila);
                 }
@@ -39,26 +44,24 @@ public class CSV {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return datos;
     }
 
-    public void escribirCSV(String rutaArchivo) {
+    public void escribirCSV(String rutaArchivo, List<Map<String, String>> datos) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
+            if (!datos.isEmpty()) {
 
-            bw.write(String.join(",", encabezados));
-            bw.newLine();
-
-            for (Map<String, String> fila : datos) {
-                List<String> valores = new ArrayList<>();
-                for (String encabezado : encabezados) {
-                    valores.add(fila.getOrDefault(encabezado, ""));
-                }
-                bw.write(String.join(",", valores));
+                bw.write(String.join(",", datos.get(0).keySet()));
                 bw.newLine();
+
+                for (Map<String, String> fila : datos) {
+                    bw.write(String.join(",", fila.values()));
+                    bw.newLine();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }

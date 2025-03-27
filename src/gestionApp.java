@@ -35,7 +35,6 @@ public class gestionApp {
         }
     }
 
-    
     public void leerArchivo(String nombreArchivo) {
         String rutaCompleta = nombreArchivo;
         System.out.println(rutaCompleta);
@@ -56,7 +55,7 @@ public class gestionApp {
             datos = json.leerJSON(rutaCompleta);
             salir = true;
         } else if (extension.equalsIgnoreCase("xml")) {
-            xml.leerXML(rutaCompleta);
+            xml.leerArchivoXML(rutaCompleta);
             datos = xml.getElementos();
             salir = true;
         }
@@ -84,14 +83,14 @@ public class gestionApp {
         String extension = obtenerExtension(nombreArchivo);
 
         if (extension.equalsIgnoreCase("csv")) {
-            csv.escribirCSV(rutaCompleta);
+            csv.escribirCSV(rutaCompleta, datos);
             salir = true;
         } else if (extension.equalsIgnoreCase("json")) {
-            json.escribirJSON(rutaCompleta);
+            json.escribirJSON(rutaCompleta, datos);
             salir = true;
         } else if (extension.equalsIgnoreCase("xml")) {
             xml.setNombreRaiz("root");
-            xml.escribirXML(rutaCompleta);
+            xml.escribirXML(rutaCompleta, datos);
             salir = true;
         }
 
@@ -113,7 +112,7 @@ public class gestionApp {
             datos = json.leerJSON(rutaOrigen);
             salir = true;
         } else if (extensionOrigen.equalsIgnoreCase("xml")) {
-            xml.leerXML(rutaOrigen);
+            xml.leerArchivoXML(rutaOrigen);
             datos = xml.getElementos();
             salir = true;
         }
@@ -125,22 +124,21 @@ public class gestionApp {
         if (datos == null || datos.isEmpty()) {
             System.out.println("No se pudieron leer datos del archivo de origen.");
         }
-
         String extension = null;
 
         switch (formatoSalida) {
             case 1:
                 extension = "csv";
-                salir = true;
+                break;
             case 2:
                 extension = "json";
-                salir = true;
+                break;
             case 3:
                 extension = "xml";
-                salir = true;
+                break;
             default:
                 System.out.println("Formato de salida no válido.");
-                salir = false;
+                return;
         }
 
         if (!salir) {
