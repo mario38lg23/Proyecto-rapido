@@ -51,9 +51,22 @@ public class CSV {
         return datos;
     }
 
-    public void escribirCSV(String rutaArchivo) {
+    public void escribirCSV(String rutaArchivo, List<Map<String, String>> datos) {
+        
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
-
+            if (!datos.isEmpty()) {
+                bw.write(String.join(",", datos.get(0).keySet()));
+                bw.newLine();
+            }
+    
+            for (Map<String, String> fila : datos) {
+                List<String> valores = new ArrayList<>();
+                for (String encabezado : datos.get(0).keySet()) {
+                    valores.add(fila.getOrDefault(encabezado, ""));
+                }
+                bw.write(String.join(",", valores));
+                bw.newLine();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

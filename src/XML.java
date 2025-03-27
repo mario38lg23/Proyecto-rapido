@@ -33,6 +33,6 @@ public class XML {
         return null;
     }
 
-    public void escribirXML(String rutaArchivo) {
+    public void escribirXML(String rutaArchivo, List<Map<String, String>> datos) {
     }
 }
