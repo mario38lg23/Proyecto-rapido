@@ -8,12 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class JSON {
     private List<Map<String, String>> datos;
 
     public JSON() {
         this.datos = new ArrayList<>();
     }
+
 
     public List<Map<String, String>> getDatos() {
         return datos;
@@ -35,6 +41,7 @@ public class JSON {
     
                 for (String elemento : elementos) {
                     elemento = elemento.replace("{", "").replace("}", "");
+                    elemento = elemento.replace("{", "").replace("}", "");
                     Map<String, String> mapa = new HashMap<>();
                     String[] pares = elemento.split(",");
     
@@ -55,6 +62,7 @@ public class JSON {
         return datos;
     }
 
+    public void escribirJSON(String rutaArchivo, List<Map<String, String>> datos) {
     public void escribirJSON(String rutaArchivo, List<Map<String, String>> datos) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
             bw.write("[\n");

@@ -35,7 +35,6 @@ public class gestionApp {
         }
     }
 
-    
     public void leerArchivo(String nombreArchivo) {
         String rutaCompleta = nombreArchivo;
         System.out.println(rutaCompleta);
@@ -56,7 +55,7 @@ public class gestionApp {
             datos = json.leerJSON(rutaCompleta);
             salir = true;
         } else if (extension.equalsIgnoreCase("xml")) {
-            xml.leerXML(rutaCompleta);
+            xml.leerArchivoXML(rutaCompleta);
             datos = xml.getElementos();
             salir = true;
         }
@@ -113,7 +112,7 @@ public class gestionApp {
             datos = json.leerJSON(rutaOrigen);
             salir = true;
         } else if (extensionOrigen.equalsIgnoreCase("xml")) {
-            xml.leerXML(rutaOrigen);
+            xml.leerArchivoXML(rutaOrigen);
             datos = xml.getElementos();
             salir = true;
         }
