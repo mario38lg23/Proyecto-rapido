@@ -1,3 +1,9 @@
+/**
+ * 
+ * @author Miguel Gonzalez y Mario Lopez
+ * @version 2.0
+ */
+
 import java.io.*;
 import java.util.*;
 
@@ -35,7 +41,7 @@ public class gestionApp {
         }
     }
 
-    public void leerArchivo(String nombreArchivo) {
+    public void leerArchivo(String nombreArchivo) throws IOException{
         String rutaCompleta = nombreArchivo;
         System.out.println(rutaCompleta);
         File archivo = new File(rutaCompleta);
@@ -55,8 +61,7 @@ public class gestionApp {
             datos = json.leerJSON(rutaCompleta);
             salir = true;
         } else if (extension.equalsIgnoreCase("xml")) {
-            xml.leerArchivoXML(rutaCompleta);
-            datos = xml.getElementos();
+            datos = xml.leerXML(rutaCompleta);
             salir = true;
         }
 
@@ -89,7 +94,6 @@ public class gestionApp {
             json.escribirJSON(rutaCompleta, datos);
             salir = true;
         } else if (extension.equalsIgnoreCase("xml")) {
-            xml.setNombreRaiz("root");
             xml.escribirXML(rutaCompleta, datos);
             salir = true;
         }
@@ -99,7 +103,7 @@ public class gestionApp {
         }
     }
 
-    public void convertirArchivo(String archivoOrigen, int formatoSalida, String nombreSalida) {
+    public void convertirArchivo(String archivoOrigen, int formatoSalida, String nombreSalida) throws IOException{
         String rutaOrigen = archivoOrigen;
         List<Map<String, String>> datos = null;
 
@@ -112,13 +116,13 @@ public class gestionApp {
             datos = json.leerJSON(rutaOrigen);
             salir = true;
         } else if (extensionOrigen.equalsIgnoreCase("xml")) {
-            xml.leerArchivoXML(rutaOrigen);
-            datos = xml.getElementos();
+            datos = xml.leerXML(rutaOrigen);
             salir = true;
         }
 
         if (!salir) {
             System.out.println("Formato de archivo de origen no soportado.");
+            return;
         }
 
         if (datos == null || datos.isEmpty()) {

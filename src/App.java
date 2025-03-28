@@ -1,20 +1,20 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
         boolean salir = false;
         gestionApp gestion = new gestionApp();
 
-        
         do {
-            System.out.println("\nSeleccione una opción:");
+            System.out.println();
+            System.out.println("Seleccione una opción:");
             System.out.println("1. Seleccionar carpeta");
             System.out.println("2. Lectura de fichero");
             System.out.println("3. Conversión");
             System.out.println("0. Salir");
-            int opcion = sc.nextInt();
-            sc.nextLine();
+            int opcion = Integer.parseInt(sc.nextLine());
 
             switch (opcion) {
                 case 1:
@@ -36,8 +36,7 @@ public class App {
                     System.out.println("1. CSV");
                     System.out.println("2. JSON");
                     System.out.println("3. XML");
-                    int formatoSalida = sc.nextInt();
-                    sc.nextLine();
+                    int formatoSalida = Integer.parseInt(sc.nextLine());
                     System.out.println("Introduce el nombre del archivo de salida (sin extensión):");
                     String nombreSalida = sc.nextLine();
                     gestion.convertirArchivo(archivoOrigen, formatoSalida, nombreSalida);

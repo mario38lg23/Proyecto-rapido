@@ -1,106 +1,119 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+/**
+ * 
+ * @author Miguel Gonzalez y Mario Lopez
+ * @version 2.0
+ */
 
-public class XML {
-    private List<Map<String, String>> elementos;
-    private String nombreRaiz;
+ import java.io.BufferedReader;
+ import java.io.BufferedWriter;
+ import java.io.FileReader;
+ import java.io.FileWriter;
+ import java.io.IOException;
+ import java.util.*;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
+ public class XML {
+     private List<Map<String, String>> datos;
+     private String etiquetaRaiz;
+ 
+     public XML() {
+         this.datos = new ArrayList<>();
+     }
+ 
+     public List<Map<String, String>> getDatos() {
+         return datos;
+     }
+ 
+     public String getEtiquetaRaiz() {
+         return etiquetaRaiz;
+     }
+ 
+   public List<Map<String, String>> leerXML(String rutaArchivo) throws IOException {
+        List<Map<String, String>> datos = new ArrayList<>();
+        datos.clear();
 
-    public XML() {
-        this.elementos = new ArrayList<>();
-    }
-
-    public void setNombreRaiz(String nombreRaiz) {
-        this.nombreRaiz = nombreRaiz;
-    }
-
-    public void agregarElemento(Map<String, String> elemento) {
-        elementos.add(elemento);
-    }
-
-    public List<Map<String, String>> getElementos() {
-        return elementos;
-    }
-
-    public String getNombreRaiz() {
-        return nombreRaiz;
-    }
-
-    public void limpiarDatos() {
-        elementos.clear();
-        nombreRaiz = null;
-    }
-
-    public void leerArchivoXML(String ruta) {
-        System.out.println("El archivo seleccionado es un XML.");
-        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             StringBuilder contenidoXML = new StringBuilder();
             String linea;
+
             while ((linea = br.readLine()) != null) {
                 contenidoXML.append(linea.trim());
             }
 
             String xml = contenidoXML.toString();
-
-            Pattern cochePattern = Pattern.compile("<coche>(.*?)</coche>");
-            Matcher cocheMatcher = cochePattern.matcher(xml);
-
-            while (cocheMatcher.find()) {
-                String cocheXML = cocheMatcher.group(1);
-                Map<String, String> mapaCoche = new HashMap<>();
-                Pattern etiquetaPattern = Pattern.compile("<(\\w+)>(.*?)</\\1>");
-                Matcher etiquetaMatcher = etiquetaPattern.matcher(cocheXML);
-
-                while (etiquetaMatcher.find()) {
-                    mapaCoche.put(etiquetaMatcher.group(1), etiquetaMatcher.group(2));
-                }
-
-                elementos.add(mapaCoche);
+            if (xml.isEmpty()) {
+                throw new IOException("El archivo XML está vacío.");
             }
 
-        } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + e.getMessage());
+            Pattern patternRaiz = Pattern.compile("<(\\w+)\\s*>.*</\\1>");
+            Matcher matcherRaiz = patternRaiz.matcher(xml);
+            if (matcherRaiz.find()) {
+                this.etiquetaRaiz = matcherRaiz.group(1);
+            } else {
+                throw new IOException("No se pudo detectar una etiqueta raíz válida en el archivo XML.");
+            }
+
+            int inicioRaiz = xml.indexOf("<" + etiquetaRaiz + ">");
+            int finRaiz = xml.lastIndexOf("</" + etiquetaRaiz + ">");
+            String contenidoRaiz = xml.substring(inicioRaiz + etiquetaRaiz.length() + 2, finRaiz);
+
+            Pattern patternElemento = Pattern.compile("<(\\w+)>(.*?)</\\1>");
+            Matcher matcherElemento = patternElemento.matcher(contenidoRaiz);
+
+            while (matcherElemento.find()) {
+                Map<String, String> elemento = new LinkedHashMap<>();
+                String contenidoElemento = matcherElemento.group(2);
+                Matcher matcherSubElemento = patternElemento.matcher(contenidoElemento);
+
+                while (matcherSubElemento.find()) {
+                    String clave = matcherSubElemento.group(1);
+                    String valor = matcherSubElemento.group(2);
+                    elemento.put(clave, valor);
+                }
+
+                if (!elemento.isEmpty()) {
+                    datos.add(elemento);
+                }
+            }
         }
 
+        if (datos.isEmpty()) {
+            throw new IOException("El archivo XML no contiene datos válidos.");
+        }
+
+        return datos;
     }
-
+ 
     public void escribirXML(String rutaArchivo, List<Map<String, String>> datos) {
-
-        File file = new File(rutaArchivo);
-
-        String path = file.getAbsolutePath();
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
-
-            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
             bw.newLine();
-            bw.write("<coches>");
+            bw.write("<" + (etiquetaRaiz != null ? etiquetaRaiz : "datos") + ">");
             bw.newLine();
 
             for (Map<String, String> fila : datos) {
-                bw.write("  <coche>");
+                bw.write("  <elemento>");
                 bw.newLine();
                 for (Map.Entry<String, String> entry : fila.entrySet()) {
-                    String clave = entry.getKey();
-                    String valor = entry.getValue();
-                    bw.write("    <" + clave + ">" + valor + "</" + clave + ">");
+                    bw.write("    <" + entry.getKey() + ">" + escapeXml(entry.getValue()) + "</" + entry.getKey() + ">");
                     bw.newLine();
                 }
-                bw.write("  </coche>");
+                bw.write("  </elemento>");
                 bw.newLine();
             }
-            bw.write("</coches>");
-            System.out.println("XML creado exitosamente en: " + path);
-        } catch (IOException e) {
-            System.err.println("Error al escribir: " + e.getMessage());
-        }
 
+            bw.write("</" + (etiquetaRaiz != null ? etiquetaRaiz : "datos") + ">");
+            bw.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-}
+    private String escapeXml(String input) {
+        return input.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&apos;");
+    }
+ }

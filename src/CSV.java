@@ -1,3 +1,10 @@
+
+/**
+ * 
+ * @author Miguel Gonzalez y Mario Lopez
+ * @version 2.0
+ */
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -21,7 +28,7 @@ public class CSV {
         return encabezados;
     }
 
-    public List<Map<String, String>> leerCSV(String rutaArchivo) {
+    public List<Map<String, String>> leerCSV(String rutaArchivo) throws IOException {
         List<Map<String, String>> datos = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
@@ -34,6 +41,10 @@ public class CSV {
                 if (encabezados == null) {
                     encabezados = valores;
                 } else {
+                    if (valores.length != encabezados.length) {
+                        throw new IOException(
+                                "Error en el formato CSV: El número de valores no coincide con el número de encabezados.");
+                    }
                     Map<String, String> fila = new LinkedHashMap<>();
                     for (int i = 0; i < encabezados.length; i++) {
                         fila.put(encabezados[i], valores[i]);
@@ -41,10 +52,10 @@ public class CSV {
                     datos.add(fila);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
+        if (datos.isEmpty()) {
+            throw new IOException("El archivo CSV está vacío o no contiene datos válidos.");
+        }
         return datos;
     }
 
