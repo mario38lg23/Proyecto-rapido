@@ -8,11 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class JSON {
     private List<Map<String, String>> datos;
 
@@ -62,7 +57,6 @@ public class JSON {
         return datos;
     }
 
-    public void escribirJSON(String rutaArchivo, List<Map<String, String>> datos) {
     public void escribirJSON(String rutaArchivo, List<Map<String, String>> datos) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
             bw.write("[\n");
