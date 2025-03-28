@@ -41,20 +41,17 @@ public class XML {
 
                 if (etiquetaRaiz == null && linea.startsWith("<") && !linea.startsWith("</") && !linea.startsWith("<?") && !linea.startsWith("<!")) {
                     etiquetaRaiz = extraerEtiqueta(linea);
-                    continue;
                 }
 
                 if (!dentroObjeto && linea.startsWith("<") && !linea.startsWith("</")) {
                     dentroObjeto = true;
                     elementoActual = new HashMap<>();
-                    continue;
                 }
 
                 if (linea.startsWith("</") && dentroObjeto) {
                     datos.add(elementoActual);
                     elementoActual = null;
                     dentroObjeto = false;
-                    continue;
                 }
 
                 if (dentroObjeto && linea.startsWith("<") && linea.contains("</")) {
