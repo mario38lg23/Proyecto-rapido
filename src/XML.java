@@ -1,79 +1,72 @@
 /**
  * 
  * @author Miguel Gonzalez y Mario Lopez
- * @version 2.0
+ * @version 2.1
+ * @since 28/03/2025
+ * 
  */
 
- import java.io.BufferedReader;
- import java.io.BufferedWriter;
- import java.io.FileReader;
- import java.io.FileWriter;
- import java.io.IOException;
- import java.util.*;
- import java.util.regex.Matcher;
- import java.util.regex.Pattern;
- 
- public class XML {
-     private List<Map<String, String>> datos;
-     private String etiquetaRaiz;
- 
-     public XML() {
-         this.datos = new ArrayList<>();
-     }
- 
-     public List<Map<String, String>> getDatos() {
-         return datos;
-     }
- 
-     public String getEtiquetaRaiz() {
-         return etiquetaRaiz;
-     }
- 
-   public List<Map<String, String>> leerXML(String rutaArchivo) throws IOException {
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+
+public class XML {
+    private List<Map<String, String>> datos;
+    private String etiquetaRaiz;
+
+    public XML() {
+        this.datos = new ArrayList<>();
+    }
+
+    public List<Map<String, String>> getDatos() {
+        return datos;
+    }
+
+    public String getEtiquetaRaiz() {
+        return etiquetaRaiz;
+    }
+
+    public List<Map<String, String>> leerXML(String rutaArchivo) throws IOException {
         List<Map<String, String>> datos = new ArrayList<>();
-        datos.clear();
+        Map<String, String> elementoActual = null;
+        boolean dentroObjeto = false;
 
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
-            StringBuilder contenidoXML = new StringBuilder();
             String linea;
-
             while ((linea = br.readLine()) != null) {
-                contenidoXML.append(linea.trim());
-            }
+                linea = linea.trim();
 
-            String xml = contenidoXML.toString();
-            if (xml.isEmpty()) {
-                throw new IOException("El archivo XML está vacío.");
-            }
-
-            Pattern patternRaiz = Pattern.compile("<(\\w+)\\s*>.*</\\1>");
-            Matcher matcherRaiz = patternRaiz.matcher(xml);
-            if (matcherRaiz.find()) {
-                this.etiquetaRaiz = matcherRaiz.group(1);
-            } else {
-                throw new IOException("No se pudo detectar una etiqueta raíz válida en el archivo XML.");
-            }
-
-            int inicioRaiz = xml.indexOf("<" + etiquetaRaiz + ">");
-            int finRaiz = xml.lastIndexOf("</" + etiquetaRaiz + ">");
-            String contenidoRaiz = xml.substring(inicioRaiz + etiquetaRaiz.length() + 2, finRaiz);
-
-            Pattern patternElemento = Pattern.compile("<(\\w+)>(.*?)</\\1>");
-            Matcher matcherElemento = patternElemento.matcher(contenidoRaiz);
-
-            while (matcherElemento.find()) {
-                Map<String, String> elemento = new LinkedHashMap<>();
-                String contenidoElemento = matcherElemento.group(2);
-                Matcher matcherSubElemento = patternElemento.matcher(contenidoElemento);
-
-                while (matcherSubElemento.find()) {
-                    String clave = matcherSubElemento.group(1);
-                    String valor = matcherSubElemento.group(2);
-                    elemento.put(clave, valor);
+                // Detectar la etiqueta raíz
+                if (etiquetaRaiz == null && linea.startsWith("<") && !linea.startsWith("</") && !linea.startsWith("<?") && !linea.startsWith("<!")) {
+                    etiquetaRaiz = extraerEtiqueta(linea);
+                    continue;
                 }
 
-                if (!elemento.isEmpty()) {
-                    datos.add(elemento);
+                // Detectar el inicio de un objeto (segunda etiqueta encontrada)
+                if (!dentroObjeto && linea.startsWith("<") && !linea.startsWith("</")) {
+                    dentroObjeto = true;
+                    elementoActual = new HashMap<>();
+                    continue;
+                }
+
+                // Detectar el cierre de un objeto
+                if (linea.startsWith("</") && dentroObjeto) {
+                    datos.add(elementoActual);
+                    elementoActual = null;
+                    dentroObjeto = false;
+                    continue;
+                }
+
+                // Extraer clave-valor
+                if (dentroObjeto && linea.startsWith("<") && linea.contains("</")) {
+                    String clave = extraerEtiqueta(linea);
+                    String valor = extraerValor(linea);
+                    if (clave != null && valor != null) {
+                        elementoActual.put(clave, valor);
+                    }
                 }
             }
         }
@@ -84,18 +77,29 @@
 
         return datos;
     }
- 
-    public void escribirXML(String rutaArchivo, List<Map<String, String>> datos) {
+
+    private String extraerEtiqueta(String linea) {
+        int inicio = linea.indexOf("<") + 1;
+        int fin = linea.indexOf(">");
+        return (inicio >= 0 && fin > inicio) ? linea.substring(inicio, fin).trim() : null;
+    }
+
+    private String extraerValor(String linea) {
+        int inicio = linea.indexOf(">") + 1;
+        int fin = linea.indexOf("</");
+        return (inicio >= 0 && fin > inicio) ? linea.substring(inicio, fin).trim() : null;
+    }
+
+    public void escribirXML(String rutaArchivo, List<Map<String, String>> datos) throws IOException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
-            bw.newLine();
             bw.write("<" + (etiquetaRaiz != null ? etiquetaRaiz : "datos") + ">");
             bw.newLine();
 
-            for (Map<String, String> fila : datos) {
+            for (Map<String, String> elemento : datos) {
                 bw.write("  <elemento>");
                 bw.newLine();
-                for (Map.Entry<String, String> entry : fila.entrySet()) {
-                    bw.write("    <" + entry.getKey() + ">" + escapeXml(entry.getValue()) + "</" + entry.getKey() + ">");
+                for (Map.Entry<String, String> entry : elemento.entrySet()) {
+                    bw.write("    <" + entry.getKey() + ">" + entry.getValue() + "</" + entry.getKey() + ">");
                     bw.newLine();
                 }
                 bw.write("  </elemento>");
@@ -103,17 +107,6 @@
             }
 
             bw.write("</" + (etiquetaRaiz != null ? etiquetaRaiz : "datos") + ">");
-            bw.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
-
-    private String escapeXml(String input) {
-        return input.replace("&", "&amp;")
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;")
-                    .replace("\"", "&quot;")
-                    .replace("'", "&apos;");
-    }
- }
+}

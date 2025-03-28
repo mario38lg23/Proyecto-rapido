@@ -2,6 +2,8 @@
  * 
  * @author Miguel Gonzalez y Mario Lopez
  * @version 2.0
+ * @since 28/03/2025
+ * 
  */
 
 import java.io.*;
@@ -83,7 +85,7 @@ public class gestionApp {
         return puntoIndex > 0 ? nombreArchivo.substring(puntoIndex + 1) : "";
     }
 
-    public void escribirArchivo(String nombreArchivo, List<Map<String, String>> datos) {
+    public void escribirArchivo(String nombreArchivo, List<Map<String, String>> datos) throws IOException {
         String rutaCompleta = nombreArchivo;
         String extension = obtenerExtension(nombreArchivo);
     

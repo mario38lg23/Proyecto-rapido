@@ -1,11 +1,26 @@
+
+/**
+ * 
+ * @author Miguel Gonzalez y Mario Lopez
+ * @version 2.0
+ * @since 28/03/2025
+ * 
+ */
+
 import java.io.IOException;
 import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
+        String ruta = "";
         boolean salir = false;
         gestionApp gestion = new gestionApp();
+
+        System.out.println("----- MENU -----");
+        System.out.println("La ruta de la carpeta es : " + ruta);
+        gestion.comprobarFichero(ruta);
+        System.out.println("---------------");
 
         do {
             System.out.println();
@@ -17,16 +32,23 @@ public class App {
             int opcion = Integer.parseInt(sc.nextLine());
 
             switch (opcion) {
+
                 case 1:
                     System.out.println("Introduce la ruta de la carpeta:");
-                    String ruta = sc.nextLine();
+                    ruta = sc.nextLine();
+                    System.out.println("----- MENU -----");
+                    System.out.println("La ruta de la carpeta es : " + ruta);
                     gestion.comprobarFichero(ruta);
+                    System.out.println("---------------");
                     break;
 
                 case 2:
                     System.out.println("Introduce el nombre del archivo a leer:");
                     String nombreArchivo = sc.nextLine();
+                    System.out.println("----- MENU -----");
+                    System.out.println("La ruta completa es : " + nombreArchivo);
                     gestion.leerArchivo(nombreArchivo);
+                    System.out.println("---------------");
                     break;
 
                 case 3:
@@ -41,6 +63,7 @@ public class App {
                     String nombreSalida = sc.nextLine();
                     gestion.convertirArchivo(archivoOrigen, formatoSalida, nombreSalida);
                     break;
+
                 case 0:
                     salir = true;
                     System.out.println("Saliendo del programa...");

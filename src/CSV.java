@@ -3,6 +3,8 @@
  * 
  * @author Miguel Gonzalez y Mario Lopez
  * @version 2.0
+ * @since 26/03/2025
+ * 
  */
 
 import java.io.BufferedReader;
@@ -43,7 +45,7 @@ public class CSV {
                 } else {
                     if (valores.length != encabezados.length) {
                         throw new IOException(
-                                "Error en el formato CSV: El número de valores no coincide con el número de encabezados.");
+                        "Error en el formato CSV: El número de valores no coincide con el número de encabezados.");
                     }
                     Map<String, String> fila = new LinkedHashMap<>();
                     for (int i = 0; i < encabezados.length; i++) {
