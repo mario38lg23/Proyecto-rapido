@@ -1,7 +1,7 @@
 /**
  * 
  * @author Miguel Gonzalez y Mario Lopez
- * @version 2.2
+ * @version 2.3
  * @since 28/03/2025
  * 
  */
@@ -86,7 +86,15 @@ public class XML {
 
     public void escribirXML(String rutaArchivo, List<Map<String, String>> datos) throws IOException {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
-            bw.write("<" + (etiquetaRaiz != null ? etiquetaRaiz : "datos") + ">");
+            String etiqueta;
+
+            if (etiquetaRaiz != null) {
+                etiqueta = etiquetaRaiz;
+            } else {
+                etiqueta = "datos";
+            }
+            
+            bw.write("<" + etiqueta + ">");
             bw.newLine();
 
             for (Map<String, String> elemento : datos) {
@@ -100,7 +108,11 @@ public class XML {
                 bw.newLine();
             }
 
-            bw.write("</" + (etiquetaRaiz != null ? etiquetaRaiz : "datos") + ">");
+            if (etiquetaRaiz == null) {
+                bw.write("</datos>");
+            } else {
+                bw.write("</" + etiquetaRaiz + ">");
+            }
         }
     }
 }
