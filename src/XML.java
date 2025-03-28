@@ -1,7 +1,7 @@
 /**
  * 
  * @author Miguel Gonzalez y Mario Lopez
- * @version 2.1
+ * @version 2.2
  * @since 28/03/2025
  * 
  */
@@ -39,20 +39,17 @@ public class XML {
             while ((linea = br.readLine()) != null) {
                 linea = linea.trim();
 
-                // Detectar la etiqueta raíz
                 if (etiquetaRaiz == null && linea.startsWith("<") && !linea.startsWith("</") && !linea.startsWith("<?") && !linea.startsWith("<!")) {
                     etiquetaRaiz = extraerEtiqueta(linea);
                     continue;
                 }
 
-                // Detectar el inicio de un objeto (segunda etiqueta encontrada)
                 if (!dentroObjeto && linea.startsWith("<") && !linea.startsWith("</")) {
                     dentroObjeto = true;
                     elementoActual = new HashMap<>();
                     continue;
                 }
 
-                // Detectar el cierre de un objeto
                 if (linea.startsWith("</") && dentroObjeto) {
                     datos.add(elementoActual);
                     elementoActual = null;
@@ -60,7 +57,6 @@ public class XML {
                     continue;
                 }
 
-                // Extraer clave-valor
                 if (dentroObjeto && linea.startsWith("<") && linea.contains("</")) {
                     String clave = extraerEtiqueta(linea);
                     String valor = extraerValor(linea);
@@ -70,11 +66,9 @@ public class XML {
                 }
             }
         }
-
         if (datos.isEmpty()) {
             throw new IOException("El archivo XML no contiene datos válidos.");
         }
-
         return datos;
     }
 
